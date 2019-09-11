@@ -13,7 +13,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String debugLable = 'Unknown';
-final JPush jpush = new JPush();
+  final JPush jpush = new JPush();
   @override
   void initState() {
     super.initState();
@@ -23,13 +23,12 @@ final JPush jpush = new JPush();
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String platformVersion;
-    
 
     // Platform messages may fail, so we use a try/catch PlatformException.
     jpush.getRegistrationID().then((rid) {
       setState(() {
-          debugLable = "flutter getRegistrationID: $rid";
-        });
+        debugLable = "flutter getRegistrationID: $rid";
+      });
     });
 
     jpush.setup(
@@ -37,35 +36,31 @@ final JPush jpush = new JPush();
       channel: "theChannel",
       production: false,
       debug: true,
-      );
-    jpush.applyPushAuthority(new NotificationSettingsIOS(
-      sound: true,
-      alert: true,
-      badge: true));
+    );
+    jpush.applyPushAuthority(
+        new NotificationSettingsIOS(sound: true, alert: true, badge: true));
 
     try {
-      
       jpush.addEventHandler(
         onReceiveNotification: (Map<String, dynamic> message) async {
-        print("flutter onReceiveNotification: $message");
-        setState(() {
+          print("flutter onReceiveNotification: $message");
+          setState(() {
             debugLable = "flutter onReceiveNotification: $message";
           });
-      },
-      onOpenNotification: (Map<String, dynamic> message) async {
-        print("flutter onOpenNotification: $message");
-        setState(() {
+        },
+        onOpenNotification: (Map<String, dynamic> message) async {
+          print("flutter onOpenNotification: $message");
+          setState(() {
             debugLable = "flutter onOpenNotification: $message";
           });
-      },
-      onReceiveMessage: (Map<String, dynamic> message) async {
-        print("flutter onReceiveMessage: $message");
-        setState(() {
+        },
+        onReceiveMessage: (Map<String, dynamic> message) async {
+          print("flutter onReceiveMessage: $message");
+          setState(() {
             debugLable = "flutter onReceiveMessage: $message";
           });
-      },
+        },
       );
-
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -80,8 +75,6 @@ final JPush jpush = new JPush();
     });
   }
 
-
-
 // 编写视图
   @override
   Widget build(BuildContext context) {
@@ -91,207 +84,184 @@ final JPush jpush = new JPush();
           title: const Text('Plugin example app'),
         ),
         body: new Center(
-          child: new Column(
-            children:[
-              new Text('result: $debugLable\n'), 
-              new FlatButton(
-              child: new Text('sendLocalNotification\n'), 
-              onPressed: () {
-                // 三秒后出发本地推送
-                var fireDate = DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch + 3000);
-                var localNotification = LocalNotification(
-                    id: 234,
-                    title: 'fadsfa',
-                    buildId: 1,
-                    content: 'fdas',
-                    fireTime: fireDate,
-                    subtitle: 'fasf',
-                    badge: 5,
-                    extra: {"fa": "0"}
-                  );
-                jpush.sendLocalNotification(localNotification).then((res) {
-                  setState(() {
+            child: SingleChildScrollView(
+              child: new Column(children: [
+          new Text('result: $debugLable\n'),
+          new FlatButton(
+                child: new Text('sendLocalNotification\n'),
+                onPressed: () {
+                  // 三秒后出发本地推送
+                  var fireDate = DateTime.fromMillisecondsSinceEpoch(
+                      DateTime.now().millisecondsSinceEpoch + 3000);
+                  var localNotification = LocalNotification(
+                      id: 234,
+                      title: 'fadsfa',
+                      buildId: 1,
+                      content: 'fdas',
+                      fireTime: fireDate,
+                      subtitle: 'fasf',
+                      badge: 5,
+                      extra: {"fa": "0"});
+                  ///发送本地通知
+                  jpush.sendLocalNotification(localNotification).then((res) {
+                    setState(() {
                       debugLable = res;
                     });
-                });
-
-              }),
-              new FlatButton(
-                child: new Text('getLaunchAppNotification\n'), 
+                  });
+                }),
+          new FlatButton(
+                child: new Text('getLaunchAppNotification\n'),
                 onPressed: () {
-                  
+                  ///获取AppNotification
                   jpush.getLaunchAppNotification().then((map) {
                     setState(() {
                       debugLable = "getLaunchAppNotification success: $map";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "getLaunchAppNotification error: $error";
                     });
                   });
-
                 }),
-              new FlatButton(
-              child: new Text('applyPushAuthority\n'), 
-              onPressed: () {
-                jpush.applyPushAuthority(NotificationSettingsIOS(badge: true, alert: true, sound: true));
-              }),
-              new FlatButton(
-                child: new Text('setTags\n'), 
+          new FlatButton(
+                child: new Text('applyPushAuthority\n'),
                 onPressed: () {
-                  jpush.setTags(["lala","haha"]).then((map) {
+                  jpush.applyPushAuthority(NotificationSettingsIOS(
+                      badge: true, alert: true, sound: true));
+                }),
+          new FlatButton(
+                child: new Text('setTags\n'),
+                onPressed: () {
+                  ///设置tags
+                  jpush.setTags(["lala", "haha"]).then((map) {
                     var tags = map['tags'];
                     setState(() {
                       debugLable = "set tags success: $map $tags";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "set tags error: $error";
                     });
-                  }) ;
+                  });
                 }),
-              new FlatButton(
-              child: new Text('cleanTags\n'), 
-              onPressed: () {
-                    jpush.cleanTags().then((map) {
+          new FlatButton(
+                child: new Text('cleanTags\n'),
+                onPressed: () {
+                  ///清理tags
+                  jpush.cleanTags().then((map) {
                     var tags = map['tags'];
                     setState(() {
                       debugLable = "cleanTags success: $map $tags";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "cleanTags error: $error";
                     });
-                  }) ;
-              }),
-              new FlatButton(
-                child: new Text('addTags\n'), 
+                  });
+                }),
+          new FlatButton(
+                child: new Text('addTags\n'),
                 onPressed: () {
-                  
-                    jpush.addTags(["lala","haha"]).then((map) {
+                  ///添加tags
+                  jpush.addTags(["lala", "haha"]).then((map) {
                     var tags = map['tags'];
                     setState(() {
                       debugLable = "addTags success: $map $tags";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "addTags error: $error";
                     });
-                  }) ;
-
+                  });
                 }),
-              new FlatButton(
-                child: new Text('deleteTags\n'), 
+          new FlatButton(
+                child: new Text('deleteTags\n'),
                 onPressed: () {
-                  
-                  jpush.deleteTags(["lala","haha"]).then((map) {
+                  ///删除tags
+                  jpush.deleteTags(["lala", "haha"]).then((map) {
                     var tags = map['tags'];
                     setState(() {
                       debugLable = "deleteTags success: $map $tags";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "deleteTags error: $error";
                     });
-                  }) ;
-
+                  });
                 }),
-              new FlatButton(
-                child: new Text('getAllTags\n'), 
+          new FlatButton(
+                child: new Text('getAllTags\n'),
                 onPressed: () {
-                  
                   jpush.getAllTags().then((map) {
                     setState(() {
                       debugLable = "getAllTags success: $map";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "getAllTags error: $error";
                     });
-                  }) ;
-
+                  });
                 }),
-              new FlatButton(
-                child: new Text('setAlias\n'), 
+          new FlatButton(
+                child: new Text('setAlias\n'),
                 onPressed: () {
-                  
                   jpush.setAlias("thealias11").then((map) {
                     setState(() {
                       debugLable = "setAlias success: $map";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "setAlias error: $error";
                     });
-                  }) ;
-
+                  });
                 }),
-              new FlatButton(
-                child: new Text('deleteAlias\n'), 
+          new FlatButton(
+                child: new Text('deleteAlias\n'),
                 onPressed: () {
-                  
                   jpush.deleteAlias().then((map) {
                     setState(() {
                       debugLable = "deleteAlias success: $map";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "deleteAlias error: $error";
                     });
-                  }) ;
-
+                  });
                 }),
-              new FlatButton(
-                child: new Text('setBadge\n'), 
+          new FlatButton(
+                child: new Text('setBadge\n'),
                 onPressed: () {
-                  
+                  ///设置badge
                   jpush.setBadge(66).then((map) {
                     setState(() {
                       debugLable = "setBadge success: $map";
                     });
-                  })
-                  .catchError((error) {
+                  }).catchError((error) {
                     setState(() {
                       debugLable = "setBadge error: $error";
                     });
-                  }) ;
-
+                  });
                 }),
-              new FlatButton(
-                child: new Text('stopPush\n'), 
+          new FlatButton(
+                child: new Text('stopPush\n'),
+                ///提示推送
                 onPressed: () {
-                  
                   jpush.stopPush();
-
                 }),
-              new FlatButton(
-                child: new Text('resumePush\n'), 
+          new FlatButton(
+                child: new Text('resumePush\n'),
+                ///开始推送
                 onPressed: () {
-                  
                   jpush.resumePush();
-
                 }),
-              new FlatButton(
-                child: new Text('clearAllNotifications\n'), 
+          new FlatButton(
+                child: new Text('clearAllNotifications\n'),
+                ///清理推送
                 onPressed: () {
-                  
                   jpush.clearAllNotifications();
-
                 }),
-              
-                
-            ]
-          )
-          
-        ),
+        ]),
+            )),
       ),
     );
   }
